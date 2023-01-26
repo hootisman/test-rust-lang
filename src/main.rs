@@ -1,6 +1,6 @@
 mod lexer;
 use std::env;
-use lexer::token::{Token, TokenType};
+use lexer::token::{Token, TokenType, LiteralType};
 use lexer::Lexer;
 
 fn main() {
@@ -18,7 +18,7 @@ fn main() {
         
     }
 
-    let test: Token = Token{ ttype: TokenType::STAR, lexeme: "2322222323", line: 2 };
+    let test: Token = Token{ ttype: TokenType::STAR, lexeme: "2322222323", literal: LiteralType::number(2322222232), line: 2 };
 
     println!("{}",test.to_string());
     
@@ -40,12 +40,14 @@ fn run(file: String) {
         let test1 = Token{
             ttype: TokenType::MINUS,
             lexeme: "-",
+            literal: LiteralType::char('-'),
             line: 43,
         };
 
         let test2 = Token{
             ttype: TokenType::NUMBER,
             lexeme: "23123",
+            literal: LiteralType::number(23123),
             line: 43,
         };
         leex.tokens.push(test1);
