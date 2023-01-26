@@ -1,11 +1,11 @@
 pub mod token;
+use std::{ iter::Peekable, vec::IntoIter};
+
 use self::token::{Token, TokenType, LiteralType};
 
 pub struct Lexer<'a> {
-    pub src: String,
+    pub src: Peekable<IntoIter<u8>>,
     pub tokens: Vec<Token<'a>>,
-    pub start: u16,
-    pub current: u16,
     pub line: u16,
 }
 
@@ -13,32 +13,49 @@ impl Lexer<'_>{
     pub fn new<'a>(src: String) -> Lexer<'a>{
         let tokens: Vec<Token<'a>> = Vec::new();
         Lexer {
-            src,
+            src: src.into_bytes().into_iter().peekable(),
             tokens,
-            start: 0,
-            current: 0,
             line: 1,
         }
     }
-    fn is_at_end(&self) -> bool{
-        let length: u16 = self.src.len() as u16;
-        self.current >= length
+    fn add_token(&mut self, ttype: TokenType, literal: LiteralType){
+    
+        self.tokens.push( Token {
+                            ttype,
+                            lexeme: "",
+                            literal,
+                            line: self.line,
+                        });
     }
-    fn scan_token(&mut self){
-
+    fn scan_token(&mut self, c: char){
+        println!("{}",c );
+        match c {
+            '-' => self.add_token(TokenType::MINUS, LiteralType::Char('-')),
+            '+' => self.add_token(TokenType::PLUS, LiteralType::Char('+')),
+            '.' => self.add_token(TokenType::DOT, LiteralType::Char('.')),
+            '*' => self.add_token(TokenType::STAR, LiteralType::Char('*')),
+            _ => self.syntax_error(self.line, "Found unknown character"),
+        }
     }
     pub fn scan_tokens(&mut self){
-        while !self.is_at_end() {
-            self.start = self.current;
-            self.scan_token();
+        loop {
+            //keep iterating through source code until at EOF
+            match self.src.next() {
+                Some(c) => self.scan_token(c as char),
+                None => break,
+            }
         }
 
-        let eof_tok = Token {
+        let eof_tok = Token {       //EOF token
             ttype: TokenType::EOF,
             lexeme: "",
-            literal: LiteralType::None,
+            literal: LiteralType::None(0),      //EOF, lexeme is size 0
             line: self.line,
         };
         self.tokens.push(eof_tok);
+    }
+    fn syntax_error(&self,line: u16, message: &str){
+        eprintln!("[line: {}] ERROR: {}",line,message);
+        std::process::exit(exitcode::USAGE)
     }
 }

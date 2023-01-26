@@ -2,9 +2,10 @@ use std::fmt::Debug;
 
 #[derive(Debug)]
 pub enum LiteralType {
-    number(i64),
-    char(char),
-    None,
+    Number(i64),
+    Char(char),
+    String(String),
+    None(u32),          //u32 = size of lexeme
 }
 
 #[derive(Debug)]

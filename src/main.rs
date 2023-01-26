@@ -4,7 +4,6 @@ use lexer::token::{Token, TokenType, LiteralType};
 use lexer::Lexer;
 
 fn main() {
-    println!("Hello, world!");
     let args: Vec<_> = env::args().collect();
     if args.len() > 2 {
         println!("Usage: bin [script]");
@@ -18,9 +17,9 @@ fn main() {
         
     }
 
-    let test: Token = Token{ ttype: TokenType::STAR, lexeme: "2322222323", literal: LiteralType::number(2322222232), line: 2 };
-
-    println!("{}",test.to_string());
+    // let test: Token = Token{ ttype: TokenType::STAR, lexeme: "2322222323", literal: LiteralType::number(2322222232), line: 2 };
+    //
+    // println!("{}",test.to_string());
     
 
 }
@@ -35,27 +34,27 @@ fn run_file(file_path: &str) {
     };
 }
 fn run(file: String) {
-    print!("Sucess! string: \"{}\"",file);
     let mut leex: Lexer = Lexer::new(file);
-        let test1 = Token{
-            ttype: TokenType::MINUS,
-            lexeme: "-",
-            literal: LiteralType::char('-'),
-            line: 43,
-        };
-
-        let test2 = Token{
-            ttype: TokenType::NUMBER,
-            lexeme: "23123",
-            literal: LiteralType::number(23123),
-            line: 43,
-        };
-        leex.tokens.push(test1);
-        leex.tokens.push(test2);
-
-        for token in leex.tokens.iter() {
-            println!("{}",token.to_string());
-        }
+        // let test1 = Token{
+        //     ttype: TokenType::MINUS,
+        //     lexeme: "-",
+        //     literal: LiteralType::char('-'),
+        //     line: 43,
+        // };
+        //
+        // let test2 = Token{
+        //     ttype: TokenType::NUMBER,
+        //     lexeme: "23123",
+        //     literal: LiteralType::number(23123),
+        //     line: 43,
+        // };
+        // leex.tokens.push(test1);
+        // leex.tokens.push(test2);
+        //
+        // for token in leex.tokens.iter() {
+        //     println!("{}",token.to_string());
+        // }
+    leex.scan_tokens();
 }
 fn syntax_error(line: u16, message: &str){
     eprintln!("[line: {}] ERROR: {}",line,message);
