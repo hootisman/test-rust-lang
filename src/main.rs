@@ -55,8 +55,5 @@ fn run(file: String) {
         //     println!("{}",token.to_string());
         // }
     leex.scan_tokens();
-}
-fn syntax_error(line: u16, message: &str){
-    eprintln!("[line: {}] ERROR: {}",line,message);
-    std::process::exit(exitcode::USAGE)
+    leex.print_tokens();
 }

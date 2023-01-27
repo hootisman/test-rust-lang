@@ -9,32 +9,39 @@ pub struct Lexer<'a> {
     pub line: u16,
 }
 
-impl Lexer<'_>{
-    pub fn new<'a>(src: String) -> Lexer<'a>{
-        let tokens: Vec<Token<'a>> = Vec::new();
+impl<'a> Lexer<'a>{
+    pub fn new<'b>(src: String) -> Lexer<'b>{
+        let tokens: Vec<Token<'b>> = Vec::new();
         Lexer {
             src: src.into_bytes().into_iter().peekable(),
             tokens,
             line: 1,
         }
     }
-    fn add_token(&mut self, ttype: TokenType, literal: LiteralType){
-    
-        self.tokens.push( Token {
+    fn add_token(&mut self, ttype: TokenType, lexeme: &'a str){
+        self.tokens.push( Token{
                             ttype,
-                            lexeme: "",
-                            literal,
+                            lexeme,
                             line: self.line,
                         });
     }
     fn scan_token(&mut self, c: char){
         println!("{}",c );
         match c {
-            '-' => self.add_token(TokenType::MINUS, LiteralType::Char('-')),
-            '+' => self.add_token(TokenType::PLUS, LiteralType::Char('+')),
-            '.' => self.add_token(TokenType::DOT, LiteralType::Char('.')),
-            '*' => self.add_token(TokenType::STAR, LiteralType::Char('*')),
-            _ => self.syntax_error(self.line, "Found unknown character"),
+            '-' => self.add_token(TokenType::MINUS, "-"),
+            '+' => self.add_token(TokenType::PLUS, "+"),
+            '.' => self.add_token(TokenType::DOT, "."),
+            '*' => self.add_token(TokenType::STAR, "*"),
+            ';' => self.add_token(TokenType::SEMICOLON, ";"),
+            '(' => self.add_token(TokenType::LEFTPAREN, "("),
+            ')' => self.add_token(TokenType::RIGHTPAREN, ")"),
+            id @ 'a'..='z' | id @ 'A'..='Z' => self.add_token(TokenType::IDENTIFER(id), ""),
+            num @ '0'..='9' => {
+                self.add_token(TokenType::NUMBER(num.to_digit(10).unwrap()), ")");
+            },
+            '\n' => self.line += 1,
+            ' ' | '\r' | '\t' => (),
+            _ => self.syntax_error("Found unknown character"),
         }
     }
     pub fn scan_tokens(&mut self){
@@ -46,16 +53,15 @@ impl Lexer<'_>{
             }
         }
 
-        let eof_tok = Token {       //EOF token
-            ttype: TokenType::EOF,
-            lexeme: "",
-            literal: LiteralType::None(0),      //EOF, lexeme is size 0
-            line: self.line,
-        };
-        self.tokens.push(eof_tok);
+        self.add_token(TokenType::EOF, "");      //EOF token
     }
-    fn syntax_error(&self,line: u16, message: &str){
-        eprintln!("[line: {}] ERROR: {}",line,message);
+    pub fn print_tokens(&self){
+        for token in self.tokens.iter() {
+            println!("{}",token.to_string());
+        }
+    }
+    fn syntax_error(&self, message: &str){
+        eprintln!("[line: {}] ERROR: {}",self.line,message);
         std::process::exit(exitcode::USAGE)
     }
 }
