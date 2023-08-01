@@ -1,6 +1,6 @@
 mod lexer;
 use std::env;
-use lexer::token::{Token, TokenType, LiteralType};
+use lexer::token::{Token, TokenType, };
 use lexer::Lexer;
 
 fn main() {

@@ -5,6 +5,7 @@ use std::fmt::Debug;
 pub enum TokenType {
     MINUS,
     PLUS,
+    EQUAL,
     DOT,
     STAR,
     SEMICOLON,
@@ -12,7 +13,7 @@ pub enum TokenType {
     RIGHTPAREN,
 
     //literals
-    NUMBER(u32),
+    NUMBER(i32),
     IDENTIFER(char),
 
     EOF,
@@ -22,13 +23,11 @@ pub enum TokenType {
 pub struct Token<'a> {
     pub ttype: TokenType,
     pub lexeme: &'a str,
-    // pub literal: LiteralType,
     pub line: u16,
 }
 
 impl Token<'_> {
     pub fn to_string(&self) -> String{
-        // format!("{:?}, \"{}\", {:?}", self.ttype, self.lexeme, self.literal)
         format!("line {}, {:?}, \"{}\"",self.line, self.ttype, self.lexeme)
     }
 
