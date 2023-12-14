@@ -4,17 +4,17 @@ use std::{ iter::Peekable, vec::IntoIter};
 use self::token::{Token, TokenType };
 
 pub struct Lexer<'a> {
-    pub src: Peekable<IntoIter<u8>>,
+    pub source: Peekable<IntoIter<u8>>,
     pub tokens: Vec<Token<'a>>,
     pub line: u16,
 }
 
 impl<'a> Lexer<'a>{
+    /// Creates a new Lexical Analyzer with the 'peekable' source code
     pub fn new<'b>(src: String) -> Lexer<'b>{
-        //converts src string to peekable
         let tokens: Vec<Token<'b>> = Vec::new();
         Lexer {
-            src: src.into_bytes().into_iter().peekable(),
+            source: src.into_bytes().into_iter().peekable(),
             tokens,
             line: 1,
         }
@@ -26,26 +26,24 @@ impl<'a> Lexer<'a>{
                             line: self.line,
                         });
     }
-    fn number_token(&mut self, num: char){
-        //creates number literal by adding all chars that form the number to a
-        //string, then converting the String to a i32
-        //ex: "2323423" becomes 2323423 i32
+    ///adds a token with an i32 number created by checking for more number chars in the source code
+    fn add_number_token(&mut self, num: char){
         let mut literal = String::new();
         literal.push(num); //first char
 
         loop {
-            match self.src.peek(){
+            match self.source.peek(){
                 Some(c) if (*c as char).is_digit(10) => {
-                    //next char is a number, add src.next() to 'literal'
-                    literal.push(self.src.next().unwrap() as char);
+                    //next char is a number, add the next char to the literal
+                    literal.push(self.source.next().unwrap() as char);
                 },
                 Some(_) | None => break,
             }
         }
-        self.add_token(TokenType::NUMBER(literal.parse::<i32>().unwrap()), "");
+        let literal_i32: i32 = literal.parse::<i32>().unwrap();  //the literal as i32
+        self.add_token(TokenType::NUMBER(literal_i32), "");
     }
     fn scan_token(&mut self, c: char){
-        // println!("{}",c );
         match c {
             '+' => self.add_token(TokenType::PLUS, "+"),
             '.' => self.add_token(TokenType::DOT, "."),
@@ -56,7 +54,7 @@ impl<'a> Lexer<'a>{
             ')' => self.add_token(TokenType::RIGHTPAREN, ")"),
             '-' => self.add_token(TokenType::MINUS, "-"),
             id @ 'a'..='z' | id @ 'A'..='Z' => self.add_token(TokenType::IDENTIFER(id), ""),
-            num @ '0'..='9' => self.number_token(num),
+            num @ '0'..='9' => self.add_number_token(num),
             '\n' => self.line += 1,
             ' ' | '\r' | '\t' => (),
             _ => self.syntax_error("Found unknown character"),
@@ -64,8 +62,8 @@ impl<'a> Lexer<'a>{
     }
     pub fn scan_tokens(&mut self){
         loop {
-            //keep iterating through source code until at EOF
-            match self.src.next() {
+            //keep iterating through source code until at end
+            match self.source.next() {
                 Some(c) => self.scan_token(c as char),
                 None => break,
             }
